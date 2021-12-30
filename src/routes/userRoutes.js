@@ -11,7 +11,8 @@ router.post('/register', userController.createUser);
 
 router
   .route('/')
-  .get(userController.getUserByWallet);
+  .get(userController.getUserByWallet)
+  .patch(userController.updateMe);
   // .post(userController.createUser);
 
 // router
