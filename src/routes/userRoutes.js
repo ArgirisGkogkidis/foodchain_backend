@@ -15,6 +15,10 @@ router
   .patch(userController.updateMe);
   // .post(userController.createUser);
 
+
+router
+  .route('/users')
+  .get(userController.getAllUsers);
 // router
 //   .route('/:id')
 //   .get(userController.getUser)
