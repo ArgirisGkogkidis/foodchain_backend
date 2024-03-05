@@ -48,8 +48,5 @@ volumes:
   mongodb_data:
 
 networks:
-  # nginx-proxy:
-  #   name: nginx-proxy
-  #   external: true
   foodchain_network:  # Define the private network
     driver: bridge
