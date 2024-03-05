@@ -1,0 +1,55 @@
+version: '3.8'
+services:
+  app:
+    build: . # use this for local testing
+    container_name: foodchain_backend
+    ports:
+      - "4000:3000"
+    environment:
+      - PORT=3000
+      - DB_CONNECT_STRING=mongodb://root123user:root123pass@mongodb:27017/tBlock?authSource=admin
+    depends_on:
+      - mongodb
+    networks:
+      - foodchain_network
+
+  mongodb:
+    image: mongo:latest
+    container_name: foodchain-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: 'foodchain'
+      MONGO_INITDB_ROOT_USERNAME: root123user
+      MONGO_INITDB_ROOT_PASSWORD: root123pass
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - foodchain_network
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: foodchain-mongo-express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root123user
+      ME_CONFIG_MONGODB_ADMINPASSWORD: root123pass
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: 'true'
+      ME_CONFIG_BASICAUTH_USERNAME: user # Optional: Basic Auth username
+      ME_CONFIG_BASICAUTH_PASSWORD: pass # Optional: Basic Auth password
+    depends_on:
+      - mongodb
+    networks:
+      - foodchain_network
+
+volumes:
+  mongodb_data:
+
+networks:
+  # nginx-proxy:
+  #   name: nginx-proxy
+  #   external: true
+  foodchain_network:  # Define the private network
+    driver: bridge

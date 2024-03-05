@@ -1,0 +1,78 @@
+const User = require('./../models/userModel');
+const catchAsync = require('./../utils/catchAsync');
+const AppError = require('./../utils/appError');
+const factory = require('./handlerFactory');
+const Event = require('../models/eventModel');
+
+
+const filterObj = (obj, ...allowedFields) => {
+  const newObj = {};
+  Object.keys(obj).forEach(el => {
+    if (allowedFields.includes(el)) newObj[el] = obj[el];
+  });
+  return newObj;
+};
+
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
+
+exports.updateMe = catchAsync(async (req, res, next) => {
+  console.log(req.body)
+  // 1) Create error if user POSTs password data
+  if (req.body.password || req.body.passwordConfirm) {
+    return next(
+      new AppError(
+        'This route is not for password updates. Please use /updateMyPassword.',
+        400
+      )
+    );
+  }
+
+  // 2) Filtered out unwanted fields names that are not allowed to be updated
+  // const filteredBody = filterObj(req.body, 'name', 'email',);
+  // if (req.file) filteredBody.photo = req.file.filename;
+
+  // 3) Update user document
+  // const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
+  //   new: true,
+  //   runValidators: true
+  // });
+  const updatedUser = await User.findOneAndUpdate({ wallet: req.body.wallet }, req.body, { new: true });
+
+  console.log(updatedUser)
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user: updatedUser
+    }
+  });
+});
+
+exports.createEvent = catchAsync(async (req, res) => {
+  const doc = await Event.create(req.body);
+  res.status(201).json({
+    status: 'success',
+    doc
+  });
+});
+
+// exports.getUser = factory.getOne(User);
+exports.getAllEvents = factory.getAll(Event);
+
+exports.getEventByUser = catchAsync(async (req, res, next) => {
+    console.log(req.params)
+  let query = Event.find({ owner: req.params.id });
+  const doc = await query;
+
+  if (!doc) {
+    return next(new AppError('No document found with that owner', 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    total: doc.length,
+    doc
+  });
+});
