@@ -4,6 +4,7 @@ const eventController = require('./../controllers/eventController');
 const ingridientController = require('./../controllers/ingridientController')
 const router = express.Router();
 const Recipe = require('../models/recipeModel');
+const { getPack } = require('../controllers/web3Controller');
 
 router.get('/ingridient/all', ingridientController.getAllIngridients);
 router.get('/ingridient/byId/:id', ingridientController.getIngridientByID);
@@ -88,6 +89,7 @@ router.put('/recipes/:id', async (req, res) => {
     res.status(500).send({ message: 'Error updating recipe', error: error.message });
   }
 });
+
 router.get('/recipes/byOwner/:walletAddress', async (req, res) => {
   try {
     const { walletAddress } = req.params;
@@ -98,5 +100,7 @@ router.get('/recipes/byOwner/:walletAddress', async (req, res) => {
   }
 });
 
+
+router.route('/pack-info/:packId').get(getPack);
 
 module.exports = router;
