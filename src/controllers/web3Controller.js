@@ -59,9 +59,9 @@ async function fetchPackInfo(packId) {
 
     for (let tokenHash of packInfo[1]) {
         let tokenData = await contract.methods.getTokenData(web3.utils.toHex(tokenHash)).call();
+        let parentToken = web3.utils.toHex(tokenData[6]);
         let pastHolderHashes = await contract.methods.getTokenPastHolders(web3.utils.toHex(tokenHash)).call();
 
-        let parentToken = web3.utils.toHex(tokenData[6]);
         if (!pastHolderHashes.length && parentToken !== '0x0000000000000000000000000000000000000000000000000000000000000000' && parentToken !== web3.utils.toHex(tokenHash)) {
             pastHolderHashes = await contract.methods.getTokenPastHolders(parentToken).call();
             let nTokenData = await contract.methods.getTokenData(parentToken).call();
@@ -73,6 +73,7 @@ async function fetchPackInfo(packId) {
             }
         }
 
+        let parentTokenData = await contract.methods.getTokenData(web3.utils.toHex(parentToken)).call();
         console.log(web3.utils.toHex(tokenHash), pastHolderHashes);
         let pastHolders = [];
         for (let holderHash of pastHolderHashes) {
@@ -91,7 +92,8 @@ async function fetchPackInfo(packId) {
             holder: tokenData[3],
             pendingHolder: tokenData[4],
             mintedOn: tokenData[5],
-            pastHolders: pastHolders
+            pastHolders: pastHolders,
+            parentMinted: parentTokenData[5]
         };
         packResponse.tokens.push(tokenInfo);
     }
