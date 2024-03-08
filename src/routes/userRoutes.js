@@ -70,6 +70,29 @@ router.get('/recipes/:id', async (req, res) => {
   }
 });
 
+// PATCH route to add pack IDs to a recipe
+router.patch('/recipes/:id/packs', async (req, res) => {
+  try {
+    const { packIds } = req.body; // Assume packIds are sent in the request body
+    const recipeId = req.params.id;
+
+    // Find the recipe by ID and update it by adding new pack IDs to the packIds array
+    const updatedRecipe = await Recipe.findByIdAndUpdate(
+      recipeId,
+      { $push: { packIds: { $each: packIds } } }, // $push with $each to add multiple values
+      { new: true, runValidators: true } // Options to return the updated object and run schema validators
+    );
+
+    if (!updatedRecipe) {
+      return res.status(404).send('Recipe not found');
+    }
+
+    res.status(200).json(updatedRecipe);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
 
 router.put('/recipes/:id', async (req, res) => {
   const { id } = req.params;

@@ -12,6 +12,7 @@ const recipeSchema = new mongoose.Schema({
   title: String, // e.g., "ΠΑΤΑΤΕΣ -ΚΟΛΟΚΥΘΙΑ-ΚΑΡΟΤΟ 350γρ ΚΤΨ"
   totalUnits: Number, // e.g., 100
   ingredients: [recipeIngredientSchema],
+  packIds: [String],
   owner: String, // Add this line
 });
 
