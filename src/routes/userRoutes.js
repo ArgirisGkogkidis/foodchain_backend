@@ -122,7 +122,23 @@ router.get('/recipes/byOwner/:walletAddress', async (req, res) => {
     res.status(500).send({ message: 'Error fetching recipes by owner', error });
   }
 });
+// Endpoint to get a recipe by packId
+router.get('/recipes/by-pack/:packId', async (req, res) => {
+  try {
+    const packId = req.params.packId;
 
+    const recipe = await Recipe.findOne({ packIds: { $in: [packId] } });
+
+    if (!recipe) {
+      return res.status(404).send('Recipe containing the specified packId not found');
+    }
+
+    res.json(recipe);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
 
 router.route('/pack-info/:packId').get(getPack);
 
